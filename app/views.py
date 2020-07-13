@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from .models import Agent, Company, Property
 from .serializer import AgentSerializer, PropertySerializer
 from .permissions import IsAdminOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 
 # Create your views here.
 def home(request):
@@ -26,10 +27,10 @@ class AgentList(APIView):
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
 class AgentDesc(APIView):
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
     def get_agents(self, pk):
         try:
             return Agent.objects.get(pk=pk)
@@ -68,10 +69,10 @@ class PropertyList(APIView):
             return Response(serializers.data, status=status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
 class PropertyDesc(APIView):
-    permission_classes = (IsAdminOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     def get_properties(self, pk):
         try:
@@ -81,13 +82,10 @@ class PropertyDesc(APIView):
 
     def get(self, request, pk, format=None):
         props = self.get_properties(pk)
-        if props:
-            serializers = PropertySerializer(props)
-            return Response(serializers.data)
-        elif Http404:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializers = PropertySerializer(props)
+        return Response(serializers.data)
+            
+       
 
     def put(self, request, pk, format=None):
         prop = self.get_properties(pk)
