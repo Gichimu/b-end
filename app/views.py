@@ -3,15 +3,15 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from .models import Agent, Company, Property
-from .serializer import AgentSerializer
+from .serializer import AgentSerializer, PropertySerializer
 from .permissions import IsAdminOrReadOnly
 
 # Create your views here.
 def home(request):
     return render(request, 'index.html')
 
-def properties(request):
-    return render(request, 'property.html')
+# def properties(request):
+#     return render(request, 'property.html')
 
 class AgentList(APIView):
     def get(self, request, format=None):
@@ -20,7 +20,6 @@ class AgentList(APIView):
         return Response(serializers.data)
 
     def post(self, request, format=None):
-        
         serializers = AgentSerializer(data=request.data)
         if serializers.is_valid():
             serializers.save()
@@ -55,3 +54,51 @@ class AgentDesc(APIView):
         agent = self.get_agents(pk)
         agent.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class PropertyList(APIView):
+    def get(self, request, format=None):
+        properties = Property.objects.all()
+        serializers = PropertySerializer(properties, many=True)
+        return Response(serializers.data)
+
+    def post(self, request, format=None):
+        serializers = PropertySerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data, status=status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    permission_classes = (IsAdminOrReadOnly,)
+
+class PropertyDesc(APIView):
+    permission_classes = (IsAdminOrReadOnly,)
+
+    def get_properties(self, pk):
+        try:
+            return Property.objects.get(pk=pk)
+        except Property.DoesNotExist:
+            return Http404
+
+    def get(self, request, pk, format=None):
+        props = self.get_properties(pk)
+        if props:
+            serializers = PropertySerializer(props)
+            return Response(serializers.data)
+        elif Http404:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk, format=None):
+        prop = self.get_properties(pk)
+        serializers = PropertySerializer(prop, request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data)
+        else:
+            return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        prop = self.get_properties(pk)
+        prop.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)        

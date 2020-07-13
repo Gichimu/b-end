@@ -19,7 +19,7 @@ class Property(models.Model):
     location = models.CharField(max_length=50)
     description = models.TextField()
     bookmarked = models.BooleanField(default=False)
-    
+
     agent = models.ForeignKey(Agent, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -31,3 +31,4 @@ class Company(models.Model):
 
     def __str__(self):
         return self.title
+
