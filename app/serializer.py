@@ -10,3 +10,8 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = ('id', 'title', 'transaction_type', 'price', 'bedrooms', 'bathrooms', 'location', 'description', 'bookmarked', 'agent')
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ('title', 'location')

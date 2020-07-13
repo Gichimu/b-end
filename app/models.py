@@ -1,10 +1,17 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+class Company(models.Model):
+    title = models.CharField(max_length=50)
+    location = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.title
 
 class Agent(models.Model):
-    fname = models.CharField(max_length=25)
-    lname = models.CharField(max_length=25)
-    email = models.CharField(max_length=50)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=25)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
     about_me = models.TextField()
 
     def __str__(self):
@@ -25,10 +32,5 @@ class Property(models.Model):
     def __str__(self):
         return self.title
 
-class Company(models.Model):
-    title = models.CharField(max_length=50)
-    location = models.CharField(max_length=50)
 
-    def __str__(self):
-        return self.title
 
